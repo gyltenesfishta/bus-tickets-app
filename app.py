@@ -12,10 +12,14 @@ from io import BytesIO
 from datetime import datetime, timedelta
 import stripe
 from flask import Flask, request, jsonify
+import os
+from dotenv import load_dotenv
 
-stripe.api_key = "sk_test_51Sa08OLEYnCumwJRFHnSnI63SaAfohFjJI9wkPXYlIRdexcahCdeonHDJ6Vx0PqNL9kyKCfjHuSHfnt4AtY4LBfD004VxdqPy9"
 
-STRIPE_WEBHOOK_SECRET = "whsec_d6348e43b184b3074ba89b7ba5b9ad541c5c61ccc9d5838136761963722df5b5"
+load_dotenv()
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 
 
@@ -26,13 +30,13 @@ CORS(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = "gyltene.sfishta@gmail.com"
-app.config['MAIL_PASSWORD'] = "tishwsyryxeoovhm"   
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD") 
 app.config['MAIL_DEFAULT_SENDER'] = "gyltene.sfishta@gmail.com"
 
 mail = Mail(app)
 
-SECRET_KEY = b"tishwsyryxeoovhm"
+SECRET_KEY = os.getenv("APP_SECRET_KEY").encode()
 
 @app.route("/api/tickets", methods=["POST"])
 def api_tickets():
@@ -425,8 +429,6 @@ def checkin_ticket(token):
             return jsonify({"error": "Ticket not found"}), 404
 
         status = row["status"]
-
-        # kontrolli i pageses
         if status == "reserved":
             return jsonify({"error": "Ticket is not paid yet."}), 400
 
